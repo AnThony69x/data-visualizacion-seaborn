@@ -1,40 +1,33 @@
-# Dependencias de Python (no se usan en Vercel)
+# Archivos Python (no necesarios en Vercel)
+*.py
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+*.pyc
+*.pyo
+*.pyd
 
-# Entornos virtuales
+# Dependencias Python
 venv/
-ENV/
 env/
+ENV/
+.venv/
+
+# Archivos de configuración Python
+requirements.txt
+*.egg-info/
+
+# Carpetas de Python
+graficos/
+data/
 
 # Archivos del sistema
 .DS_Store
 Thumbs.db
+.git/
+.gitignore
 
 # IDEs
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
 
 # Vercel
 .vercel
@@ -42,7 +35,5 @@ Thumbs.db
 # Logs
 *.log
 
-# No ignorar las carpetas de output con los gráficos
-!output/
-!output/images/
-!output/interactive/
+# Documentación que no es necesaria
+DEPLOY.md
