@@ -1,0 +1,1035 @@
+<! DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 Seaborn + Plotly Visualización Interactiva</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1DB954 0%, #191414 100%);
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "♪ ♫ ♪ ♫ ♪ ♫ ♪ ♫";
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            font-size: 2em;
+            opacity: 0.1;
+            animation: float 10s infinite linear;
+        }
+
+        @keyframes float {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100%); }
+        }
+
+        header h1 {
+            font-size: 3. 5em;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            margin-bottom: 25px;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.25);
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+
+        .badge:hover {
+            background: rgba(255,255,255,0. 4);
+            transform: scale(1.1);
+        }
+
+        /* NAVIGATION */
+        nav {
+            background: #191414;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0;
+        }
+
+        nav li {
+            margin: 0;
+        }
+
+        nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 18px 30px;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: #1DB954;
+            transition: all 0.3s;
+            transform: translateX(-50%);
+        }
+
+        nav a:hover {
+            background: #282828;
+        }
+
+        nav a:hover::after {
+            width: 80%;
+        }
+
+        /* SECTIONS */
+        section {
+            padding: 80px 40px;
+        }
+
+        section:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        h2 {
+            font-size: 2.8em;
+            margin-bottom: 40px;
+            color: #191414;
+            text-align: center;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: #1DB954;
+            border-radius: 2px;
+        }
+
+        /* INTRO */
+        .intro-content {
+            max-width: 900px;
+            margin: 0 auto;
+            font-size: 1.15em;
+            line-height: 1.9;
+            color: #555;
+            text-align: center;
+        }
+
+        .intro-content strong {
+            color: #1DB954;
+            font-weight: 600;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #1DB954, #1ed760);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 40px auto;
+            max-width: 800px;
+            text-align: center;
+            font-size: 1.2em;
+            box-shadow: 0 10px 30px rgba(29, 185, 84, 0.3);
+        }
+
+        /* GRÁFICOS INTERACTIVOS */
+        .graph-interactive {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin: 50px 0;
+            border: 3px solid transparent;
+            transition: all 0.4s;
+        }
+
+        .graph-interactive:hover {
+            border-color: #1DB954;
+            box-shadow: 0 20px 60px rgba(29, 185, 84, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .graph-header {
+            padding: 30px 40px;
+            background: linear-gradient(135deg, #1DB954, #1ed760);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .graph-header-left {
+            flex: 1;
+        }
+
+        .graph-header h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .graph-number {
+            background: rgba(255,255,255,0.3);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3em;
+            border: 2px solid white;
+        }
+
+        .graph-header p {
+            margin: 0;
+            opacity: 0.95;
+            font-size: 1.05em;
+        }
+
+        .library-tag {
+            background: rgba(25, 20, 20, 0.9);
+            color: #1DB954;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            border: 2px solid #1DB954;
+        }
+
+        .graph-iframe-container {
+            width: 100%;
+            min-height: 650px;
+            background: #f8f9fa;
+            position: relative;
+        }
+
+        .graph-iframe-container iframe {
+            width: 100%;
+            height: 650px;
+            border: none;
+            display: block;
+        }
+
+        .graph-footer {
+            padding: 25px 40px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-fullscreen {
+            background: #1DB954;
+            color: white;
+        }
+
+        .btn-fullscreen:hover {
+            background: #1ed760;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(29, 185, 84, 0.4);
+        }
+
+        .btn-download {
+            background: #191414;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #282828;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-code {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-code:hover {
+            background: #5a6268;
+            transform: scale(1.05);
+        }
+
+        /* CARACTERÍSTICAS */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 35px;
+            margin-top: 50px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            transition: all 0. 3s;
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: #1DB954;
+            box-shadow: 0 15px 40px rgba(29, 185, 84, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3. 5em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            color: #191414;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* TECNOLOGÍAS */
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 50px;
+        }
+
+        .tech-item {
+            background: white;
+            padding: 25px 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #191414;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .tech-item:hover {
+            transform: scale(1.1);
+            border-color: #1DB954;
+            box-shadow: 0 10px 30px rgba(29, 185, 84, 0.3);
+        }
+
+        .tech-item span {
+            color: #1DB954;
+            margin-right: 10px;
+        }
+
+        /* EQUIPO */
+        .team-container {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            margin-top: 50px;
+        }
+
+        .team-member {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            min-width: 250px;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .team-member:hover {
+            transform: scale(1.05);
+            border-color: #1DB954;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #1DB954, #1ed760);
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: white;
+            box-shadow: 0 8px 25px rgba(29, 185, 84, 0.4);
+        }
+
+        .team-member h3 {
+            color: #191414;
+            margin-bottom: 10px;
+            font-size: 1. 6em;
+        }
+
+        .team-member p {
+            color: #1DB954;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* INSTRUCCIONES */
+        .instructions {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-top: 50px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .step {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #1DB954;
+        }
+
+        .step h4 {
+            color: #191414;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .step code {
+            background: #191414;
+            color: #1DB954;
+            padding: 15px 20px;
+            display: block;
+            border-radius: 10px;
+            margin-top: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            overflow-x: auto;
+        }
+
+        /* FOOTER */
+        footer {
+            background: #191414;
+            color: white;
+            text-align: center;
+            padding: 50px 40px;
+        }
+
+        footer p {
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        footer a {
+            color: #1DB954;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        footer a:hover {
+            color: #1ed760;
+            text-decoration: underline;
+        }
+
+        /* SCROLL TO TOP */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #1DB954, #1ed760);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(29, 185, 84, 0.4);
+            transition: all 0. 3s;
+            z-index: 999;
+        }
+
+        .scroll-top:hover {
+            transform: scale(1.1);
+        }
+
+        .scroll-top.visible {
+            display: flex;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.2em;
+            }
+
+            nav ul {
+                flex-direction: column;
+            }
+
+            h2 {
+                font-size: 2em;
+            }
+
+            .graph-iframe-container iframe {
+                height: 500px;
+            }
+
+            .graph-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <h1>🎵 Seaborn + Plotly Visualización</h1>
+            <p>Análisis Interactivo de Datos de Spotify con Python</p>
+            <div class="badges">
+                <span class="badge">🎓 ULEAM</span>
+                <span class="badge">📊 7 Gráficos Interactivos</span>
+                <span class="badge">🐍 Python</span>
+                <span class="badge">📈 Seaborn + Plotly</span>
+                <span class="badge">2025</span>
+            </div>
+        </header>
+
+        <!-- NAVIGATION -->
+        <nav>
+            <ul>
+                <li><a href="#inicio">🏠 Inicio</a></li>
+                <li><a href="#graficos">📊 Gráficos Interactivos</a></li>
+                <li><a href="#caracteristicas">✨ Características</a></li>
+                <li><a href="#tecnologias">🔧 Tecnologías</a></li>
+                <li><a href="#equipo">👥 Equipo</a></li>
+                <li><a href="#instrucciones">📖 Instrucciones</a></li>
+            </ul>
+        </nav>
+
+        <!-- INICIO -->
+        <section id="inicio">
+            <h2>📖 Sobre el Proyecto</h2>
+            <div class="intro-content">
+                <p>
+                    Sistema completo de <strong>visualización interactiva de datos</strong> 
+                    que combina el poder estadístico de <strong>Seaborn</strong> con la 
+                    interactividad de <strong>Plotly</strong>. 
+                </p>
+                <p style="margin-top: 20px;">
+                    Cada gráfico está disponible en <strong>dos versiones</strong>:
+                    PNG estático de alta resolución (300 DPI) para reportes, y 
+                    HTML interactivo con zoom, pan, hover tooltips y exportación desde el navegador.
+                </p>
+            </div>
+
+            <div class="highlight-box">
+                <strong>✨ TOTALMENTE INTERACTIVO ✨</strong><br>
+                Haz zoom, mueve los gráficos, explora datos con hover,<br>
+                y exporta en alta resolución directamente desde tu navegador.
+            </div>
+        </section>
+
+        <!-- GRÁFICOS INTERACTIVOS -->
+        <section id="graficos" style="background: #f8f9fa;">
+            <h2>📊 Galería de Visualizaciones Interactivas</h2>
+            
+            <!-- GRÁFICO 1: BARRAS -->
+            <div class="graph-interactive">
+                <div class="graph-header">
+                    <div class="graph-header-left">
+                        <h3>
+                            <span class="graph-number">1</span>
+                            📊 Gráfico de Barras
+                        </h3>
+                        <p><strong>Variables:</strong> Artista (eje Y) vs Popularidad Promedio 0-100 (eje X)</p>
+                        <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%); padding: 14px 20px; border-radius: 12px; border-left: 5px solid #ff9800; margin-top: 12px; box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);">
+                            <p style="margin: 0; font-size: 0.95em; line-height: 1.6; color: #664d03;"><strong style="color: #ff6f00;">📊 ANÁLISIS:</strong> Taylor Swift domina el ranking con ~100 de popularidad promedio. Los top 5 (Swift, Drake, Bad Bunny, The Weeknd, Sabrina Carpenter) están concentrados en el rango 90-100, evidenciando un mercado dominado por superestrellas. Brecha notable entre los primeros 5 y el resto del top 15.</p>
+                        </div>
+                    </div>
+                    <span class="library-tag">Seaborn + Plotly</span>
+                </div>
+                
+                <div class="graph-iframe-container">
+                    <iframe src="output/interactive/01_barras.html" loading="lazy"></iframe>
+                </div>
+                
+                <div class="graph-footer">
+                    <a href="output/interactive/01_barras.html" target="_blank" class="btn btn-fullscreen">
+                        🔍 Pantalla Completa
+                    </a>
+                    <a href="output/images/01_barras.png" download class="btn btn-download">
+                        💾 Descargar PNG
+                    </a>
+                </div>
+            </div>
+
+            <!-- GRÁFICO 2: MAPA DE CALOR -->
+            <div class="graph-interactive">
+                <div class="graph-header">
+                    <div class="graph-header-left">
+                        <h3>
+                            <span class="graph-number">2</span>
+                            🔥 Mapa de Calor
+                        </h3>
+                        <p><strong>Variables:</strong> Popularidad Canción, Popularidad Artista, Seguidores Artista, Duración (min)</p>
+                        <div style="background: linear-gradient(135deg, #cfe2ff 0%, #9ec5fe 100%); padding: 14px 20px; border-radius: 12px; border-left: 5px solid #0d6efd; margin-top: 12px; box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);">
+                            <p style="margin: 0; font-size: 0.95em; line-height: 1.6; color: #084298;"><strong style="color: #0a58ca;">📊 ANÁLISIS:</strong> Correlación FUERTE (0.64) entre Popularidad Artista ↔ Seguidores (artistas populares = más seguidores). Correlación MODERADA (0.47) entre Popularidad Canción ↔ Popularidad Artista (las canciones de artistas famosos tienden a ser populares, pero no siempre). La Duración (0.11-0.21) NO afecta el éxito musical - canciones largas o cortas pueden ser igual de exitosas.</p>
+                        </div>
+                    </div>
+                    <span class="library-tag">Seaborn + Plotly</span>
+                </div>
+                
+                <div class="graph-iframe-container">
+                    <iframe src="output/interactive/02_mapa_calor.html" loading="lazy"></iframe>
+                </div>
+                
+                <div class="graph-footer">
+                    <a href="output/interactive/02_mapa_calor.html" target="_blank" class="btn btn-fullscreen">
+                        🔍 Pantalla Completa
+                    </a>
+                    <a href="output/images/02_mapa_calor.png" download class="btn btn-download">
+                        💾 Descargar PNG
+                    </a>
+                </div>
+            </div>
+
+            <!-- GRÁFICO 3: HISTOGRAMAS -->
+            <div class="graph-interactive">
+                <div class="graph-header">
+                    <div class="graph-header-left">
+                        <h3>
+                            <span class="graph-number">3</span>
+                            📈 Histogramas con KDE
+                        </h3>
+                        <p><strong>Variables:</strong> (1) Popularidad 0-100, (2) Duración en minutos, (3) Popularidad por Contenido Explícito, (4) Seguidores en escala logarítmica</p>
+                        <div style="background: linear-gradient(135deg, #d1e7dd 0%, #a3cfbb 100%); padding: 14px 20px; border-radius: 12px; border-left: 5px solid #198754; margin-top: 12px; box-shadow: 0 2px 8px rgba(25, 135, 84, 0.2);">
+                            <p style="margin: 0; font-size: 0.95em; line-height: 1.6; color: #0f5132;"><strong style="color: #146c43;">📊 ANÁLISIS:</strong> <u>Popularidad:</u> Distribución BIMODAL con picos en 0 (canciones no escuchadas) y 70-80 (hits) - patrón de "todo o nada". <u>Duración:</u> Distribución NORMAL centrada en 3-4 minutos (estándar de la industria). <u>Contenido Explícito:</u> Curvas similares confirman que NO afecta la popularidad. <u>Seguidores:</u> Amplia dispersión (10^6 a 10^8) muestra la brecha entre artistas pequeños y megaestrellas.</p>
+                        </div>
+                    </div>
+                    <span class="library-tag">Seaborn + Plotly</span>
+                </div>
+                
+                <div class="graph-iframe-container">
+                    <iframe src="output/interactive/03_histogramas.html" loading="lazy"></iframe>
+                </div>
+                
+                <div class="graph-footer">
+                    <a href="output/interactive/03_histogramas.html" target="_blank" class="btn btn-fullscreen">
+                        🔍 Pantalla Completa
+                    </a>
+                    <a href="output/images/03_histogramas.png" download class="btn btn-download">
+                        💾 Descargar PNG
+                    </a>
+                </div>
+            </div>
+
+            <!-- GRÁFICO 4: BOXPLOTS -->
+            <div class="graph-interactive">
+                <div class="graph-header">
+                    <div class="graph-header-left">
+                        <h3>
+                            <span class="graph-number">4</span>
+                            📦 Boxplots (Caja y Bigotes)
+                        </h3>
+                        <p><strong>Variables:</strong> (1) Popularidad por Contenido Explícito, (2) Duración (min) por Tipo de Álbum, (3) Popularidad Top 10 Artistas, (4) Distribución General de Popularidad</p>
+                        <div style="background: linear-gradient(135deg, #f8d7da 0%, #f1aeb5 100%); padding: 14px 20px; border-radius: 12px; border-left: 5px solid #dc3545; margin-top: 12px; box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);">
+                            <p style="margin: 0; font-size: 0.95em; line-height: 1.6; color: #842029;"><strong style="color: #b02a37;">📊 ANÁLISIS:</strong> <u>Medianas consistentes</u> (~55-70) entre todos los artistas top demuestran calidad uniforme. <u>Albums completos</u> muestran mayor variabilidad en duración (outliers de 10-14 min) vs Singles más homogéneos (~3 min). <u>Outliers frecuentes en 80-100</u> representan los hits de cada artista. The Weeknd es el MÁS CONSISTENTE (rango intercuartílico pequeño), mientras Ariana Grande tiene mayor variabilidad.</p>
+                        </div>
+                    </div>
+                    <span class="library-tag">Seaborn + Plotly</span>
+                </div>
+                
+                <div class="graph-iframe-container">
+                    <iframe src="output/interactive/04_boxplots.html" loading="lazy"></iframe>
+                </div>
+                
+                <div class="graph-footer">
+                    <a href="output/interactive/04_boxplots.html" target="_blank" class="btn btn-fullscreen">
+                        🔍 Pantalla Completa
+                    </a>
+                    <a href="output/images/04_boxplots.png" download class="btn btn-download">
+                        💾 Descargar PNG
+                    </a>
+                </div>
+            </div>
+
+            <!-- GRÁFICO 5: ENJAMBRE -->
+            <div class="graph-interactive">
+                <div class="graph-header">
+                    <div class="graph-header-left">
+                        <h3>
+                            <span class="graph-number">5</span>
+                            🐝 Gráfico de Enjambre (Swarmplot)
+                        </h3>
+                        <p><strong>Variables:</strong> (1) Popularidad por Contenido Explícito [Cada punto = 1 canción], (2) Popularidad de Top 5 Artistas Más Frecuentes [Muestra de 500 canciones]</p>
+                        <div style="background: linear-gradient(135deg, #e7d3ff 0%, #d0a9f5 100%); padding: 14px 20px; border-radius: 12px; border-left: 5px solid #9333ea; margin-top: 12px; box-shadow: 0 2px 8px rgba(147, 51, 234, 0.2);">
+                            <p style="margin: 0; font-size: 0.95em; line-height: 1.6; color: #4c1d95;"><strong style="color: #7c3aed;">📊 ANÁLISIS:</strong> <u>Densidad visualizada:</u> Taylor Swift y The Weeknd tienen la MAYOR concentración de puntos en 60-80 (alta consistencia en hits). <u>Nirvana</u> muestra distribución MÁS BAJA y dispersa (música de catálogo antiguo). <u>Ventaja del swarmplot:</u> Visualiza CADA canción individual sin ocultar datos, revelando patrones que histogramas comprimen. Claramente se ven las canciones con popularidad 0 en la base.</p>
+                        </div>
+                    </div>
+                    <span class="library-tag">Seaborn + Plotly</span>
+                </div>
+                
+                <div class="graph-iframe-container">
+                    <iframe src="output/interactive/05_enjambre.html" loading="lazy"></iframe>
+                </div>
+                
+                <div class="graph-footer">
+                    <a href="output/interactive/05_enjambre.html" target="_blank" class="btn btn-fullscreen">
+                        🔍 Pantalla Completa
+                    </a>
+                    <a href="output/images/05_enjambre.png" download class="btn btn-download">
+                        💾 Descargar PNG
+                    </a>
+                </div>
+            </div>
+
+            <!-- GRÁFICO 6: KDE -->
+            <div class="graph-interactive">
+                <div class="graph-header">
+                    <div class="graph-header-left">
+                        <h3>
+                            <span class="graph-number">6</span>
+                            📉 Gráficos de Densidad (KDE)
+                        </h3>
+                        <p><strong>Variables:</strong> (1) Densidad de Popularidad, (2) Densidad por Contenido Explícito, (3) Densidad 2D: Seguidores (log) vs Popularidad, (4) Densidad de Duración</p>
+                        <div style="background: linear-gradient(135deg, #cff4fc 0%, #9eeaf9 100%); padding: 14px 20px; border-radius: 12px; border-left: 5px solid #0dcaf0; margin-top: 12px; box-shadow: 0 2px 8px rgba(13, 202, 240, 0.2);">
+                            <p style="margin: 0; font-size: 0.95em; line-height: 1.6; color: #055160;"><strong style="color: #087990;">📊 ANÁLISIS:</strong> <u>Bimodalidad confirmada:</u> Picos claros en 0 y 70-75 con valle en 10-40 (pocas canciones "medio populares"). <u>Explícito vs No Explícito:</u> Curvas IDÉNTICAS - confirmación visual definitiva que el contenido NO afecta popularidad. <u>Densidad 2D:</u> Concentración MASIVA en 10^7 seguidores / 50-70 popularidad (tener seguidores garantiza piso de popularidad ~50 pero NO garantiza hits). <u>Duración:</u> Curva perfectamente NORMAL y simétrica centrada en 3.5 min (estándar universal).</p>
+                        </div>
+                    </div>
+                    <span class="library-tag">Seaborn + Plotly</span>
+                </div>
+                
+                <div class="graph-iframe-container">
+                    <iframe src="output/interactive/06_kde.html" loading="lazy"></iframe>
+                </div>
+                
+                <div class="graph-footer">
+                    <a href="output/interactive/06_kde.html" target="_blank" class="btn btn-fullscreen">
+                        🔍 Pantalla Completa
+                    </a>
+                    <a href="output/images/06_kde.png" download class="btn btn-download">
+                        💾 Descargar PNG
+                    </a>
+                </div>
+            </div>
+
+            <!-- GRÁFICO 7: PARETO -->
+            <div class="graph-interactive">
+                <div class="graph-header">
+                    <div class="graph-header-left">
+                        <h3>
+                            <span class="graph-number">7</span>
+                            📊 Gráfico de Pareto
+                        </h3>
+                        <p><strong>Variables:</strong> Artistas (eje X) vs Cantidad de Canciones (barras azules - eje Y izquierdo) y Porcentaje Acumulado % (línea roja - eje Y derecho)</p>
+                        <div style="background: linear-gradient(135deg, #ffe5d0 0%, #ffcb9a 100%); padding: 14px 20px; border-radius: 12px; border-left: 5px solid #fd7e14; margin-top: 12px; box-shadow: 0 2px 8px rgba(253, 126, 20, 0.2);">
+                            <p style="margin: 0; font-size: 0.95em; line-height: 1.6; color: #653208;"><strong style="color: #cc5200;">📊 ANÁLISIS:</strong> <u>LEY DE PARETO CONFIRMADA:</u> La línea roja cruza 80% en el artista #8-9, es decir, solo ~10 artistas de 20 (50%) producen el 80% de todas las canciones. <u>Taylor Swift DOMINA:</u> ~330 canciones (casi el DOBLE que The Weeknd en 2do lugar). <u>Concentración típica:</u> Top 3 (Swift, Weeknd, Lana Del Rey) representan una porción DESPROPORCIONADAMENTE grande. Esto confirma el patrón 80/20 en la industria musical - pocos artistas muy prolíficos dominan el catálogo.</p>
+                        </div>
+                    </div>
+                    <span class="library-tag">Seaborn + Plotly</span>
+                </div>
+                
+                <div class="graph-iframe-container">
+                    <iframe src="output/interactive/07_pareto.html" loading="lazy"></iframe>
+                </div>
+                
+                <div class="graph-footer">
+                    <a href="output/interactive/07_pareto.html" target="_blank" class="btn btn-fullscreen">
+                        🔍 Pantalla Completa
+                    </a>
+                    <a href="output/images/07_pareto.png" download class="btn btn-download">
+                        💾 Descargar PNG
+                    </a>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CARACTERÍSTICAS -->
+        <section id="caracteristicas">
+            <h2>✨ Características del Sistema</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🎯</span>
+                    <h3>100% Interactivo</h3>
+                    <p>Zoom, pan, hover tooltips y filtros en tiempo real en todos los gráficos. </p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">📊</span>
+                    <h3>Doble Formato</h3>
+                    <p>PNG estático (300 DPI) + HTML interactivo para máxima versatilidad.</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">🎨</span>
+                    <h3>Seaborn + Plotly</h3>
+                    <p>Combina análisis estadístico de Seaborn con interactividad de Plotly.</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">💾</span>
+                    <h3>Exportación Fácil</h3>
+                    <p>Descarga gráficos en PNG de alta resolución desde el navegador.</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">🔧</span>
+                    <h3>Código Modular</h3>
+                    <p>Estructura organizada con archivos separados para cada gráfico.</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">🚀</span>
+                    <h3>Generación Rápida</h3>
+                    <p>Script que genera todos los gráficos con un solo comando.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TECNOLOGÍAS -->
+        <section id="tecnologias" style="background: #f8f9fa;">
+            <h2>🔧 Stack Tecnológico</h2>
+            
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <span>🐍</span> Python 3.8+
+                </div>
+                <div class="tech-item">
+                    <span>📊</span> Seaborn
+                </div>
+                <div class="tech-item">
+                    <span>✨</span> Plotly
+                </div>
+                <div class="tech-item">
+                    <span>📈</span> Matplotlib
+                </div>
+                <div class="tech-item">
+                    <span>🐼</span> Pandas
+                </div>
+                <div class="tech-item">
+                    <span>🔢</span> NumPy
+                </div>
+                <div class="tech-item">
+                    <span>📉</span> SciPy
+                </div>
+            </div>
+        </section>
+
+        <!-- EQUIPO -->
+        <section id="equipo">
+            <h2>👥 Equipo de Desarrollo</h2>
+            
+            <div class="team-container">
+                <div class="team-member">
+                    <div class="avatar">👨‍💻</div>
+                    <h3>Anthony Mejia</h3>
+                    <p>@AnThony69x</p>
+                </div>
+
+                <div class="team-member">
+                    <div class="avatar">👨‍💻</div>
+                    <h3>Emilio Cardenas</h3>
+                    <p>@EmilioSle</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 50px; color: #555; font-size: 1.1em;">
+                <p><strong>🎓 Universidad:</strong> ULEAM</p>
+                <p><strong>📚 Materia:</strong> Visualización de Datos</p>
+                <p><strong>📅 Año:</strong> 2025</p>
+            </div>
+        </section>
+
+        <!-- INSTRUCCIONES -->
+        <section id="instrucciones" style="background: #f8f9fa;">
+            <h2>📖 Instrucciones de Uso</h2>
+            
+            <div class="instructions">
+                <div class="step">
+                    <h4>1️⃣ Clonar el Repositorio</h4>
+                    <code>git clone https://github.com/AnThony69x/seaborn-interactivo.git
+cd seaborn-interactivo</code>
+                </div>
+
+                <div class="step">
+                    <h4>2️⃣ Instalar Dependencias</h4>
+                    <code>pip install -r requirements.txt</code>
+                </div>
+
+                <div class="step">
+                    <h4>3️⃣ Colocar Dataset</h4>
+                    <p>Coloca tu archivo <code>spotify_data_limpio.csv</code> en la carpeta <code>data/</code></p>
+                </div>
+
+                <div class="step">
+                    <h4>4️⃣ Generar Gráficos</h4>
+                    <code>python generar_graficos.py</code>
+                    <p style="margin-top: 15px;">Esto generará:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px; color: #555;">
+                        <li>7 archivos PNG en <code>output/images/</code></li>
+                        <li>7 archivos HTML en <code>output/interactive/</code></li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <h4>5️⃣ Ver Resultados</h4>
+                    <p>Abre <code>index.html</code> en tu navegador para explorar todos los gráficos interactivos.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <p style="font-size: 1.4em; margin-bottom: 20px;">
+                <strong>🎵 Seaborn + Plotly</strong>
+            </p>
+            <p>
+                Desarrollado por Anthony Mejia & Emilio Cardenas
+            </p>
+            <p>
+                Universidad ULEAM - 2025
+            </p>
+            <p style="margin-top: 25px;">
+                <a href="https://github.com/AnThony69x" target="_blank">GitHub</a> | 
+                <a href="README.md">Documentación</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- SCROLL TO TOP BUTTON -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()">
+        ↑
+    </div>
+
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this. getAttribute('href'));
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+
+        // Scroll to top button
+        window.addEventListener('scroll', function() {
+            const scrollTop = document.getElementById('scrollTop');
+            if (window.pageYOffset > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Lazy loading para iframes (ya implementado con loading="lazy")
+        console.log('✅ Sistema de Visualización Interactiva cargado correctamente');
+        console.log('📊 7 gráficos interactivos disponibles');
+        console.log('🎯 Desarrollado por Anthony Mejia & Emilio Cardenas');
+    </script>
+</body>
+</html>
