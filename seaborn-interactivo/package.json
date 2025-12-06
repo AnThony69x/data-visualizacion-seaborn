@@ -1,0 +1,19 @@
+{
+  "name": "spotify-data-visualization",
+  "version": "1.0.0",
+  "description": "Sistema de visualización de datos de Spotify usando Seaborn + Plotly",
+  "author": "Anthony Mejia & Emilio Cardenas",
+  "license": "MIT",
+  "keywords": [
+    "spotify",
+    "data-visualization",
+    "seaborn",
+    "plotly",
+    "python",
+    "analytics"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/spotify-visualization.git"
+  }
+}
